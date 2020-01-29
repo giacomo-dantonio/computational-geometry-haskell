@@ -77,3 +77,9 @@ data ObjFile = File
     , faces      :: [ObjFace]
     , lines      :: [ObjLine]
     }
+
+addLine :: ObjVertex -> ObjFile -> ObjFile
+addLine vertex file = file { vertices = vertices file ++ [vertex]  }
+
+addLine :: ObjTexture -> ObjFile -> ObjFile
+addLine texture file = file { textures = textures file ++ [texture]  }
