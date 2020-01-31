@@ -89,8 +89,8 @@ face = do
     vertices <- sepBy vertexIndex skipSpaces
     return $ Face vertices
 
-objLine :: ReadP ObjLine
-objLine = do
+objPolyline :: ReadP Line
+objPolyline = do
     string "l "
     elements <- sepBy parseInteger skipSpaces
     return $ Line elements

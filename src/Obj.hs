@@ -2,7 +2,6 @@ module Obj where
 
 import Data.List
 
-
 data ObjVertex =
     Vertex Double Double Double
     | Vertex4 Double Double Double Double
@@ -44,6 +43,7 @@ instance Show ObjParameter where
     show (Parameter2 a b) = show (Parameter1 a) ++ " " ++ show b
     show (Parameter3 a b c) = show (Parameter2 a b) ++ " " ++ show c
 
+
 data ObjVertexIndex = 
     VertexIndex Int
     | VertexTexture Int Int
@@ -57,29 +57,26 @@ instance Show ObjVertexIndex where
     show (VertexNormal a b) = show a ++ "//" ++ show b
     show (VertexTextureNormal a b c) = show a ++ "/" ++ show b ++ "/" ++ show c
 
+
 data ObjFace = Face [ObjVertexIndex]
     deriving Eq
 
 instance Show ObjFace where
     show (Face vertices) = "f " ++ (intercalate " " $ map show vertices)
 
-data ObjLine = Line [Int]
+    
+data Line = Line [Int]
     deriving Eq
 
-instance Show ObjLine where
+instance Show Line where
     show (Line vertices) = "l " ++ (intercalate " " $ map show vertices)
 
+    
 data ObjFile = File
     { vertices   :: [ObjVertex]
     , textures   :: [ObjTexture]
     , normals    :: [ObjNormal]
     , parameters :: [ObjParameter]
     , faces      :: [ObjFace]
-    , lines      :: [ObjLine]
+    , polylines      :: [Line]
     }
-
-addLine :: ObjVertex -> ObjFile -> ObjFile
-addLine vertex file = file { vertices = vertices file ++ [vertex]  }
-
-addLine :: ObjTexture -> ObjFile -> ObjFile
-addLine texture file = file { textures = textures file ++ [texture]  }
