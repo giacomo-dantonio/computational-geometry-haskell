@@ -1,6 +1,11 @@
 module Main where
 
-import Data.List
+import Text.ParserCombinators.ReadP
+import Obj.Parse
 
+-- FIXME: print is escaping the newlines, which I don't want to.
 main :: IO ()
-main = putStrLn "Hello, Haskell!"
+main = do
+    text <- readFile "./files/teapot.obj"
+    let parsedObj = readP_to_S parseFile text
+    print parsedObj

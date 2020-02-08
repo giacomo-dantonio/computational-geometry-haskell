@@ -81,6 +81,14 @@ data ObjFile = File
     , polylines  :: [ObjPolyLine]
     }
 
+instance Show ObjFile where
+    show file = unlines $ contact [
+        fmap show (vertices file),
+        fmap show (textures file),
+        fmap show (normals file),
+        fmap show (parameters file),
+        fmap show (faces file),
+        fmap show (polylines file)]   
 
 data ObjFileLine =
     V ObjVertex

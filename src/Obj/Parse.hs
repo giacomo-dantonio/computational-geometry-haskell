@@ -1,24 +1,30 @@
 module Obj.Parse where
 
-import Control.Applicative
+import Control.Applicative ((<|>), liftA)
 import Data.Char (isDigit)
 import Text.ParserCombinators.ReadP
 
 import Obj.Obj
 
+parseSign :: (Num a) => ReadP a
+parseSign = do
+    sign <- option '+' (char '-')
+    return $ if sign == '+' then 1 else -1
 
 parseInteger :: ReadP Int
 parseInteger = do
+    sign <- parseSign
     s <- many1 $ satisfy isDigit
-    return $ read s
+    return $ sign * read s
 
 parseDouble :: ReadP Double
 parseDouble = (do
+    sign <- parseSign
     int <- many1 $ satisfy isDigit
     char '.'
     decimal <- many1 $ satisfy isDigit
     let s = int ++ "." ++ decimal
-    return $ read s
+    return $ sign * read s
     )
 
 parseNumber = fmap fromIntegral parseInteger <|> parseDouble
@@ -114,5 +120,19 @@ emptyFile = File {
     polylines = []
 }
 
---fileFromLines :: [ObjFileLine] -> ObjFile
---fileFromLines = foldl add
+fileFromLines :: [ObjFileLine] -> ObjFile
+fileFromLines = foldl addLine emptyFile
+    where
+        addLine file (V vertex) = file { vertices = vertices file ++ [vertex] }
+        addLine file (VT texture) = file { textures = textures file ++ [texture] }
+        addLine file (VN normal) = file { normals = normals file ++ [normal] }
+        addLine file (VP parameter) = file { parameters = parameters file ++ [parameter] }
+        addLine file (F face) = file { faces = faces file ++ [face] }
+        addLine file (L line) = file { polylines = polylines file ++ [line] }
+
+parseFile :: ReadP ObjFile
+parseFile = fileFromLines <$> many (do
+    line <- parseLine
+    char '\n'
+    return line)
+    
