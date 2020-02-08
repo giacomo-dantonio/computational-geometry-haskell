@@ -102,7 +102,7 @@ data ObjFile = File
     }
 
 instance Show ObjFile where
-    show file = unlines $ contact [
+    show file = unlines $ concat [
         fmap show (vertices file),
         fmap show (textures file),
         fmap show (normals file),

@@ -1,4 +1,4 @@
-module Obj.Parse where
+module Obj.Parse ( parseFile ) where
 
 import Control.Applicative ((<|>), liftA)
 import Data.Char (isDigit)
@@ -6,7 +6,7 @@ import Text.ParserCombinators.ReadP
 
 import Obj.Obj
 
--- Parse combinators for an OBJ file.
+-- Parser combinators for an OBJ file.
 
 -- TODO:
 -- - add support groups and sections
