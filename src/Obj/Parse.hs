@@ -53,7 +53,7 @@ normal = do
 
 parameter :: ReadP ObjParameter
 parameter = do
-    string "vt "
+    string "vp "
     numbers <- sepBy parseNumber skipSpaces
     case numbers of
         [a]       -> return $ Parameter1 a
@@ -89,8 +89,30 @@ face = do
     vertices <- sepBy vertexIndex skipSpaces
     return $ Face vertices
 
-objPolyline :: ReadP Line
+objPolyline :: ReadP ObjPolyLine
 objPolyline = do
     string "l "
     elements <- sepBy parseInteger skipSpaces
     return $ Line elements
+
+parseLine :: ReadP ObjFileLine
+parseLine =
+    liftA V vertex
+    <|> liftA VT texture
+    <|> liftA VN normal
+    <|> liftA VP parameter
+    <|> liftA F face
+    <|> liftA L objPolyline
+
+emptyFile :: ObjFile
+emptyFile = File {
+    vertices = [],
+    textures = [],
+    normals = [],
+    parameters = [],
+    faces = [],
+    polylines = []
+}
+
+--fileFromLines :: [ObjFileLine] -> ObjFile
+--fileFromLines = foldl add

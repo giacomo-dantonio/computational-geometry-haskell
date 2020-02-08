@@ -65,10 +65,10 @@ instance Show ObjFace where
     show (Face vertices) = "f " ++ (intercalate " " $ map show vertices)
 
     
-data Line = Line [Int]
+data ObjPolyLine = Line [Int]
     deriving Eq
 
-instance Show Line where
+instance Show ObjPolyLine where
     show (Line vertices) = "l " ++ (intercalate " " $ map show vertices)
 
     
@@ -78,5 +78,24 @@ data ObjFile = File
     , normals    :: [ObjNormal]
     , parameters :: [ObjParameter]
     , faces      :: [ObjFace]
-    , polylines      :: [Line]
+    , polylines  :: [ObjPolyLine]
     }
+
+
+data ObjFileLine =
+    V ObjVertex
+    | VT ObjTexture
+    | VN ObjNormal
+    | VP ObjParameter
+    | F ObjFace
+    | L ObjPolyLine
+    deriving Eq
+
+instance Show ObjFileLine where
+    show (V v) = show v
+    show (VT t) = show t
+    show (VN n) = show n
+    show (VP p) = show p
+    show (F f) = show f
+    show (L l) = show l
+
