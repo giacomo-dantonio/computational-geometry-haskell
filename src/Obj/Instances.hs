@@ -1,8 +1,8 @@
-module Instances where
+module Obj.Instances where
 
 import Text.ParserCombinators.ReadP
-import Obj
-import Parse
+import Obj.Obj
+import Obj.Parse
 
 class ObjLine a where
     addLine :: ObjFile -> a -> ObjFile

@@ -1,10 +1,10 @@
-module Parse where
+module Obj.Parse where
 
 import Control.Applicative
 import Data.Char (isDigit)
 import Text.ParserCombinators.ReadP
 
-import Obj
+import Obj.Obj
 
 
 parseInteger :: ReadP Int
