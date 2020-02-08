@@ -6,6 +6,15 @@ import Text.ParserCombinators.ReadP
 
 import Obj.Obj
 
+-- Parse combinators for an OBJ file.
+
+-- TODO:
+-- - add support groups and sections
+-- - add support for materials
+-- - add support for comments (just ignore them)
+
+-- Parse numbers.
+
 parseSign :: (Num a) => ReadP a
 parseSign = do
     sign <- option '+' (char '-')
@@ -28,6 +37,9 @@ parseDouble = (do
     )
 
 parseNumber = fmap fromIntegral parseInteger <|> parseDouble
+
+
+-- Parse elements of an OBJ file.
 
 vertex :: ReadP ObjVertex
 vertex = do
@@ -101,6 +113,9 @@ objPolyline = do
     elements <- sepBy parseInteger skipSpaces
     return $ Line elements
 
+
+-- Parse any line of an OBJ file.
+
 parseLine :: ReadP ObjFileLine
 parseLine =
     liftA V vertex
@@ -109,6 +124,8 @@ parseLine =
     <|> liftA VP parameter
     <|> liftA F face
     <|> liftA L objPolyline
+
+-- An empty OBJ file.
 
 emptyFile :: ObjFile
 emptyFile = File {
@@ -120,6 +137,8 @@ emptyFile = File {
     polylines = []
 }
 
+-- Fold a list of lines to an obj file.
+
 fileFromLines :: [ObjFileLine] -> ObjFile
 fileFromLines = foldl addLine emptyFile
     where
@@ -129,6 +148,8 @@ fileFromLines = foldl addLine emptyFile
         addLine file (VP parameter) = file { parameters = parameters file ++ [parameter] }
         addLine file (F face) = file { faces = faces file ++ [face] }
         addLine file (L line) = file { polylines = polylines file ++ [line] }
+
+-- Parse an OBJ file.
 
 parseFile :: ReadP ObjFile
 parseFile = fileFromLines <$> many (do

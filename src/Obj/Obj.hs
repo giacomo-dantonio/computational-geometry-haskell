@@ -1,6 +1,15 @@
 module Obj.Obj where
 
+-- Data types for the elements of an obj file
+-- see https://en.wikipedia.org/wiki/Wavefront_.obj_file#File_format
+
+-- TODO:
+-- - add support groups and sections
+-- - add support for materials
+
 import Data.List
+
+-- mesh vertices
 
 data ObjVertex =
     Vertex Double Double Double
@@ -11,6 +20,8 @@ instance Show ObjVertex where
     show (Vertex a b c) = "v " ++ show a ++ " " ++ show b ++ " " ++ show c
     show (Vertex4 a b c d) = show (Vertex a b c) ++ " " ++ show d
 
+
+-- uv coordinates for textures
 
 data ObjTexture =
     Texture1 Double
@@ -24,6 +35,8 @@ instance Show ObjTexture where
     show (Texture3 a b c) = show (Texture2 a b) ++ " " ++ show c
 
 
+-- face normals
+
 data ObjNormal = 
     Normal Double Double Double
     deriving Eq
@@ -31,6 +44,8 @@ data ObjNormal =
 instance Show ObjNormal where
     show (Normal a b c) = "vn " ++ show a ++ " " ++ show b ++ " " ++ show c
 
+
+-- parameter space
 
 data ObjParameter = 
     Parameter1 Double
@@ -43,6 +58,8 @@ instance Show ObjParameter where
     show (Parameter2 a b) = show (Parameter1 a) ++ " " ++ show b
     show (Parameter3 a b c) = show (Parameter2 a b) ++ " " ++ show c
 
+
+-- face connectivites
 
 data ObjVertexIndex = 
     VertexIndex Int
@@ -57,6 +74,7 @@ instance Show ObjVertexIndex where
     show (VertexNormal a b) = show a ++ "//" ++ show b
     show (VertexTextureNormal a b c) = show a ++ "/" ++ show b ++ "/" ++ show c
 
+-- faces
 
 data ObjFace = Face [ObjVertexIndex]
     deriving Eq
@@ -64,7 +82,9 @@ data ObjFace = Face [ObjVertexIndex]
 instance Show ObjFace where
     show (Face vertices) = "f " ++ (intercalate " " $ map show vertices)
 
-    
+
+-- polylines
+
 data ObjPolyLine = Line [Int]
     deriving Eq
 
