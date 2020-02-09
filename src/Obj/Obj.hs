@@ -103,12 +103,13 @@ data ObjFile = File
 
 instance Show ObjFile where
     show file = unlines $ concat [
-        fmap show (vertices file),
-        fmap show (textures file),
-        fmap show (normals file),
-        fmap show (parameters file),
-        fmap show (faces file),
-        fmap show (polylines file)]   
+        show <$> vertices file,
+        show <$> textures file,
+        show <$> normals file,
+        show <$> parameters file,
+        show <$> faces file,
+        show <$> polylines file]
+    
 
 data ObjFileLine =
     V ObjVertex
@@ -117,6 +118,7 @@ data ObjFileLine =
     | VP ObjParameter
     | F ObjFace
     | L ObjPolyLine
+    | Empty
     deriving Eq
 
 instance Show ObjFileLine where

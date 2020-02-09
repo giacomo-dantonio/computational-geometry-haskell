@@ -1,5 +1,6 @@
 module Obj.Parse ( parseFile ) where
 
+
 import Control.Applicative ((<|>), liftA)
 import Data.Char (isDigit)
 import Text.ParserCombinators.ReadP
@@ -44,7 +45,7 @@ parseNumber = fmap fromIntegral parseInteger <|> parseDouble
 vertex :: ReadP ObjVertex
 vertex = do
     string "v "
-    numbers <- sepBy parseNumber skipSpaces
+    numbers <- sepBy parseNumber $ char ' '
     case numbers of
         [a, b, c]    -> return $ Vertex a b c
         [a, b, c, d] -> return $ Vertex4 a b c d
@@ -54,7 +55,7 @@ vertex = do
 texture :: ReadP ObjTexture
 texture = do
     string "vt "
-    numbers <- sepBy parseNumber skipSpaces
+    numbers <- sepBy parseNumber $ char ' '
     case numbers of
         [a]       -> return $ Texture1 a
         [a, b]    -> return $ Texture2 a b
@@ -64,7 +65,7 @@ texture = do
 normal :: ReadP ObjNormal
 normal = do
     string "vn "
-    numbers <- sepBy parseNumber skipSpaces
+    numbers <- sepBy parseNumber $ char ' '
     case numbers of
         [a, b, c] -> return $ Normal a b c
         _         -> fail ""
@@ -72,7 +73,7 @@ normal = do
 parameter :: ReadP ObjParameter
 parameter = do
     string "vp "
-    numbers <- sepBy parseNumber skipSpaces
+    numbers <- sepBy parseNumber $ char ' '
     case numbers of
         [a]       -> return $ Parameter1 a
         [a, b]    -> return $ Parameter2 a b
@@ -104,13 +105,13 @@ vertexIndex = do
 face :: ReadP ObjFace
 face = do
     string "f "
-    vertices <- sepBy vertexIndex skipSpaces
+    vertices <- sepBy vertexIndex $ char ' '
     return $ Face vertices
 
 objPolyline :: ReadP ObjPolyLine
 objPolyline = do
     string "l "
-    elements <- sepBy parseInteger skipSpaces
+    elements <- sepBy parseInteger $ char ' '
     return $ Line elements
 
 
@@ -118,12 +119,19 @@ objPolyline = do
 
 parseLine :: ReadP ObjFileLine
 parseLine =
-    liftA V vertex
-    <|> liftA VT texture
-    <|> liftA VN normal
-    <|> liftA VP parameter
-    <|> liftA F face
-    <|> liftA L objPolyline
+    V <$> vertex
+    <|> VT <$> texture
+    <|> VN <$> normal
+    <|> VP <$> parameter
+    <|> F <$> face
+    <|> L <$> objPolyline
+    <|> do
+        skipMany $ char ' '
+        return Empty
+    <|> do
+        char '#'
+        skipMany (satisfy $ (/=) '\n')
+        return Empty
 
 -- An empty OBJ file.
 
@@ -148,12 +156,18 @@ fileFromLines = foldl addLine emptyFile
         addLine file (VP parameter) = file { parameters = parameters file ++ [parameter] }
         addLine file (F face) = file { faces = faces file ++ [face] }
         addLine file (L line) = file { polylines = polylines file ++ [line] }
+        addLine file Empty = file
 
 -- Parse an OBJ file.
 
-parseFile :: ReadP ObjFile
-parseFile = fileFromLines <$> many (do
+parseFileLines :: ReadP ObjFile
+parseFileLines = fileFromLines <$> many (do
     line <- parseLine
     char '\n'
     return line)
-    
+
+parseFile :: ReadP ObjFile
+parseFile = do
+    file <- parseFileLines
+    eof
+    return file

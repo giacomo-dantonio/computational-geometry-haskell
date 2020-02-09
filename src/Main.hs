@@ -2,10 +2,13 @@ module Main where
 
 import Text.ParserCombinators.ReadP
 import Obj.Parse
+import Obj.Obj
+import Data.Maybe (fromMaybe, listToMaybe)
 
--- FIXME: print is escaping the newlines, which I don't want to.
 main :: IO ()
 main = do
-    text <- readFile "./files/teapot.obj"
+    text <- readFile "./files/teapot.obj" 
     let parsedObj = readP_to_S parseFile text
-    print parsedObj
+    let maybeFile = listToMaybe [ x | (x, _) <- parsedObj ]
+    let text = fromMaybe "Unable to parse file: wrong format" $ show <$> maybeFile
+    putStrLn text
