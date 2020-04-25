@@ -113,7 +113,7 @@ objPolyline = do
     elements <- sepBy parseInteger $ char ' '
     return $ Line elements
 
--- Parse any line of an OBJ file
+-- Parse lines of an OBJ file
 
 parseLine :: ReadP ObjFileLine
 parseLine =
@@ -132,17 +132,41 @@ parseLine =
         return Empty
     -- skip not yet supported features
     <|> do
-        string "mtllib" <|> string "usemtl" <|> string "s" <|> string "g" <|> string "o"
+        string "mtllib" <|> string "usemtl" <|> string "s" <|> string "o"
         skipMany (satisfy $ (/=) '\n')
         return Empty
+
+parseLines :: ReadP [ObjFileLine]
+parseLines = many (do
+    line <- parseLine
+    char '\n'
+    return line)
+
+-- Parse groups
+-- here we assume that nested groups are not allowed
+
+parseGroup :: ReadP ObjFileLine
+parseGroup = (
+    do
+        string "g "
+        name <- munch ((/=) '\n')
+        char '\n'
+        lines <- parseLines
+        return $ Group name lines
+    ) <|> (do
+        char 'g'
+        char '\n'
+        lines <- parseLines
+        return $ UnnamedGroup lines
+    )
 
 -- Parse an OBJ file.
 
 parseFileLines :: ReadP [ObjFileLine]
-parseFileLines = many (do
-    line <- parseLine
-    char '\n'
-    return line)
+parseFileLines = do
+    lines <- parseLines
+    groups <- many parseGroup
+    return $ lines ++ groups
 
 parseFile :: ReadP ObjFile
 parseFile = do
