@@ -42,7 +42,7 @@ parseNumber = fmap fromIntegral parseInteger <|> parseDouble
 
 -- Parse elements of an OBJ file.
 
-vertex :: ReadP ObjVertex
+vertex :: ReadP ObjFileLine
 vertex = do
     string "v "
     numbers <- sepBy parseNumber $ char ' '
@@ -52,7 +52,7 @@ vertex = do
         _            -> fail ""
 
 
-texture :: ReadP ObjTexture
+texture :: ReadP ObjFileLine
 texture = do
     string "vt "
     numbers <- sepBy parseNumber $ char ' '
@@ -62,7 +62,7 @@ texture = do
         [a, b, c] -> return $ Texture3 a b c
         _         -> fail ""
 
-normal :: ReadP ObjNormal
+normal :: ReadP ObjFileLine
 normal = do
     string "vn "
     numbers <- sepBy parseNumber $ char ' '
@@ -70,7 +70,7 @@ normal = do
         [a, b, c] -> return $ Normal a b c
         _         -> fail ""
 
-parameter :: ReadP ObjParameter
+parameter :: ReadP ObjFileLine
 parameter = do
     string "vp "
     numbers <- sepBy parseNumber $ char ' '
@@ -102,13 +102,13 @@ vertexIndex = do
         c <- parseInteger
         return $ VertexTextureNormal a b c
 
-face :: ReadP ObjFace
+face :: ReadP ObjFileLine
 face = do
     string "f "
     vertices <- sepBy vertexIndex $ char ' '
     return $ Face vertices
 
-objPolyline :: ReadP ObjPolyLine
+objPolyline :: ReadP ObjFileLine
 objPolyline = do
     string "l "
     elements <- sepBy parseInteger $ char ' '
@@ -119,12 +119,12 @@ objPolyline = do
 
 parseLine :: ReadP ObjFileLine
 parseLine =
-    V <$> vertex
-    <|> VT <$> texture
-    <|> VN <$> normal
-    <|> VP <$> parameter
-    <|> F <$> face
-    <|> L <$> objPolyline
+    vertex
+    <|> texture
+    <|> normal
+    <|> parameter
+    <|> face
+    <|> objPolyline
     <|> do
         skipMany $ char ' '
         return Empty
@@ -133,35 +133,10 @@ parseLine =
         skipMany (satisfy $ (/=) '\n')
         return Empty
 
--- An empty OBJ file.
-
-emptyFile :: ObjFile
-emptyFile = File {
-    vertices = [],
-    textures = [],
-    normals = [],
-    parameters = [],
-    faces = [],
-    polylines = []
-}
-
--- Fold a list of lines to an obj file.
-
-fileFromLines :: [ObjFileLine] -> ObjFile
-fileFromLines = foldl addLine emptyFile
-    where
-        addLine file (V vertex) = file { vertices = vertices file ++ [vertex] }
-        addLine file (VT texture) = file { textures = textures file ++ [texture] }
-        addLine file (VN normal) = file { normals = normals file ++ [normal] }
-        addLine file (VP parameter) = file { parameters = parameters file ++ [parameter] }
-        addLine file (F face) = file { faces = faces file ++ [face] }
-        addLine file (L line) = file { polylines = polylines file ++ [line] }
-        addLine file Empty = file
-
 -- Parse an OBJ file.
 
 parseFileLines :: ReadP ObjFile
-parseFileLines = fileFromLines <$> many (do
+parseFileLines = Lines <$> many (do
     line <- parseLine
     char '\n'
     return line)

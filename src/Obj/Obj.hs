@@ -9,56 +9,6 @@ module Obj.Obj where
 
 import Data.List
 
--- mesh vertices
-
-data ObjVertex =
-    Vertex Double Double Double
-    | Vertex4 Double Double Double Double
-    deriving Eq
-
-instance Show ObjVertex where
-    show (Vertex a b c) = "v " ++ show a ++ " " ++ show b ++ " " ++ show c
-    show (Vertex4 a b c d) = show (Vertex a b c) ++ " " ++ show d
-
-
--- uv coordinates for textures
-
-data ObjTexture =
-    Texture1 Double
-    | Texture2 Double Double
-    | Texture3 Double Double Double
-    deriving Eq
-
-instance Show ObjTexture where
-    show (Texture1 a) = "vt " ++ show a
-    show (Texture2 a b) = show (Texture1 a) ++ " " ++ show b
-    show (Texture3 a b c) = show (Texture2 a b) ++ " " ++ show c
-
-
--- face normals
-
-data ObjNormal = 
-    Normal Double Double Double
-    deriving Eq
-
-instance Show ObjNormal where
-    show (Normal a b c) = "vn " ++ show a ++ " " ++ show b ++ " " ++ show c
-
-
--- parameter space
-
-data ObjParameter = 
-    Parameter1 Double
-    | Parameter2 Double Double
-    | Parameter3 Double Double Double
-    deriving Eq
-
-instance Show ObjParameter where
-    show (Parameter1 a) = "vp " ++ show a
-    show (Parameter2 a b) = show (Parameter1 a) ++ " " ++ show b
-    show (Parameter3 a b c) = show (Parameter2 a b) ++ " " ++ show c
-
-
 -- face connectivites
 
 data ObjVertexIndex = 
@@ -74,58 +24,44 @@ instance Show ObjVertexIndex where
     show (VertexNormal a b) = show a ++ "//" ++ show b
     show (VertexTextureNormal a b c) = show a ++ "/" ++ show b ++ "/" ++ show c
 
--- faces
 
-data ObjFace = Face [ObjVertexIndex]
-    deriving Eq
-
-instance Show ObjFace where
-    show (Face vertices) = "f " ++ (intercalate " " $ map show vertices)
-
-
--- polylines
-
-data ObjPolyLine = Line [Int]
-    deriving Eq
-
-instance Show ObjPolyLine where
-    show (Line vertices) = "l " ++ (intercalate " " $ map show vertices)
-
-    
-data ObjFile = File
-    { vertices   :: [ObjVertex]
-    , textures   :: [ObjTexture]
-    , normals    :: [ObjNormal]
-    , parameters :: [ObjParameter]
-    , faces      :: [ObjFace]
-    , polylines  :: [ObjPolyLine]
-    }
-
-instance Show ObjFile where
-    show file = unlines $ concat [
-        show <$> vertices file,
-        show <$> textures file,
-        show <$> normals file,
-        show <$> parameters file,
-        show <$> faces file,
-        show <$> polylines file]
-    
-
-data ObjFileLine =
-    V ObjVertex
-    | VT ObjTexture
-    | VN ObjNormal
-    | VP ObjParameter
-    | F ObjFace
-    | L ObjPolyLine
+data ObjFileLine = 
+    -- mesh vertices
+    Vertex Double Double Double
+    | Vertex4 Double Double Double Double
+    -- uv coordinates for textures
+    | Texture1 Double
+    | Texture2 Double Double
+    | Texture3 Double Double Double
+    -- face normals
+    | Normal Double Double Double
+    -- parameter space
+    | Parameter1 Double
+    | Parameter2 Double Double
+    | Parameter3 Double Double Double
+    -- faces
+    | Face [ObjVertexIndex]
+    -- polylines
+    | Line [Int]
+    -- empty line or comment
     | Empty
     deriving Eq
 
 instance Show ObjFileLine where
-    show (V v) = show v
-    show (VT t) = show t
-    show (VN n) = show n
-    show (VP p) = show p
-    show (F f) = show f
-    show (L l) = show l
+    show (Vertex a b c) = "v " ++ show a ++ " " ++ show b ++ " " ++ show c
+    show (Vertex4 a b c d) = show (Vertex a b c) ++ " " ++ show d
+    show (Texture1 a) = "vt " ++ show a
+    show (Texture2 a b) = show (Texture1 a) ++ " " ++ show b
+    show (Texture3 a b c) = show (Texture2 a b) ++ " " ++ show c
+    show (Normal a b c) = "vn " ++ show a ++ " " ++ show b ++ " " ++ show c
+    show (Parameter1 a) = "vp " ++ show a
+    show (Parameter2 a b) = show (Parameter1 a) ++ " " ++ show b
+    show (Parameter3 a b c) = show (Parameter2 a b) ++ " " ++ show c
+    show (Face vertices) = "f " ++ (intercalate " " $ map show vertices)
+    show (Line vertices) = "l " ++ (intercalate " " $ map show vertices)
+    show Empty = ""
 
+newtype ObjFile = Lines [ObjFileLine]
+
+instance Show ObjFile where
+    show (Lines filelines) = unlines [show line | line <- filelines]
