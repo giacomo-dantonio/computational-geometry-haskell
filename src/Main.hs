@@ -7,7 +7,7 @@ import Data.Maybe (fromMaybe, listToMaybe)
 
 main :: IO ()
 main = do
-    text <- readFile "./files/teapot.obj" 
+    text <- readFile "./files/airboat.obj" 
     let parsedObj = readP_to_S parseFile text
     let maybeFile = listToMaybe [ x | (x, _) <- parsedObj ]
     let text = fromMaybe "Unable to parse file: wrong format" $ show <$> maybeFile

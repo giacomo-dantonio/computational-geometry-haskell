@@ -6,6 +6,7 @@ module Obj.Obj where
 -- TODO:
 -- - add support groups and sections
 -- - add support for materials
+-- - add support for smoothing
 
 import Data.List
 
@@ -45,6 +46,13 @@ data ObjFileLine =
     | Line [Int]
     -- empty line or comment
     | Empty
+    -- objects
+    | UnnamedObject [ObjFileLine]
+    | Object String [ObjFileLine]
+    -- groups
+    | UnnamedGroup [ObjFileLine]
+    | Group String [ObjFileLine]
+
     deriving Eq
 
 instance Show ObjFileLine where
@@ -59,6 +67,10 @@ instance Show ObjFileLine where
     show (Parameter3 a b c) = show (Parameter2 a b) ++ " " ++ show c
     show (Face vertices) = "f " ++ (intercalate " " $ map show vertices)
     show (Line vertices) = "l " ++ (intercalate " " $ map show vertices)
+    show (UnnamedObject lines) = (unlines $ "o" : fmap show lines) ++ "\n"
+    show (Object name lines) = (unlines $ ("o " ++ name) : fmap show lines) ++ "\n"
+    show (UnnamedGroup lines) = (unlines $ "g" : fmap show lines) ++ "\n"
+    show (Group name lines) = (unlines $ ("g " ++ name) : fmap show lines) ++ "\n"
     show Empty = ""
 
 newtype ObjFile = Lines [ObjFileLine]

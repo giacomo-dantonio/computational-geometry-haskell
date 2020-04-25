@@ -12,7 +12,6 @@ import Obj.Obj
 -- TODO:
 -- - add support groups and sections
 -- - add support for materials
--- - add support for comments (just ignore them)
 
 -- Parse numbers.
 
@@ -114,8 +113,7 @@ objPolyline = do
     elements <- sepBy parseInteger $ char ' '
     return $ Line elements
 
-
--- Parse any line of an OBJ file.
+-- Parse any line of an OBJ file
 
 parseLine :: ReadP ObjFileLine
 parseLine =
@@ -132,11 +130,16 @@ parseLine =
         char '#'
         skipMany (satisfy $ (/=) '\n')
         return Empty
+    -- skip not yet supported features
+    <|> do
+        string "mtllib" <|> string "usemtl" <|> string "s" <|> string "g" <|> string "o"
+        skipMany (satisfy $ (/=) '\n')
+        return Empty
 
 -- Parse an OBJ file.
 
-parseFileLines :: ReadP ObjFile
-parseFileLines = Lines <$> many (do
+parseFileLines :: ReadP [ObjFileLine]
+parseFileLines = many (do
     line <- parseLine
     char '\n'
     return line)
@@ -145,4 +148,4 @@ parseFile :: ReadP ObjFile
 parseFile = do
     file <- parseFileLines
     eof
-    return file
+    return $ Lines file
