@@ -10,7 +10,7 @@ import Obj.Obj
 -- Parser combinators for an OBJ file.
 
 -- TODO:
--- - add support groups and sections
+-- - add support for smooths
 -- - add support for materials
 
 -- Parse numbers.
@@ -160,13 +160,43 @@ parseGroup = (
         return $ UnnamedGroup lines
     )
 
+parseGroups :: ReadP [ObjFileLine]
+parseGroups = many parseGroup
+
+-- Parse objects
+-- here we assume that nested objects are not allowed
+
+parseObject :: ReadP ObjFileLine
+parseObject = (
+    do
+        string "o "
+        name <- munch ((/=) '\n')
+        char '\n'
+        content <- parseContent
+        return $ Object name content
+    ) <|> (do
+        char 'o'
+        char '\n'
+        content <- parseContent
+        return $ UnnamedObject content
+    )
+    where
+        parseContent = do
+            lines <- parseLines
+            groups <- parseGroups
+            return $ lines ++ groups       
+
+parseObjects :: ReadP [ObjFileLine]
+parseObjects = many parseObject
+
 -- Parse an OBJ file.
 
 parseFileLines :: ReadP [ObjFileLine]
 parseFileLines = do
     lines <- parseLines
-    groups <- many parseGroup
-    return $ lines ++ groups
+    groups <- parseGroups
+    objects <- parseObjects
+    return $ lines ++ groups ++ objects
 
 parseFile :: ReadP ObjFile
 parseFile = do
