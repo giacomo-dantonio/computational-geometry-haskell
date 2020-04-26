@@ -18,9 +18,6 @@ version:             0.1.0.0
 -- A longer description of the package.
 -- description:         
 
--- URL for the project homepage or repository.
-homepage:            https://github.com/giacomo-dantonio/computational-geometry-haskell
-
 -- The license under which the package is released.
 license:             BSD3
 
@@ -37,7 +34,7 @@ maintainer:          giacomo.dantonio@gmail.com
 -- A copyright notice.
 -- copyright:           
 
-category:            Graphics
+-- category:            
 
 build-type:          Simple
 
@@ -60,7 +57,7 @@ executable computational-geometry-haskell
   -- other-extensions:    
   
   -- Other library packages from which modules are imported.
-  build-depends:       base >=4.9 && <4.10
+  build-depends:       base >=4.9 && <4.10, array >=0.5 && <0.6
   
   -- Directories containing source files.
   hs-source-dirs:      src

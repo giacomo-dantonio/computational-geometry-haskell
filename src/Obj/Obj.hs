@@ -1,4 +1,8 @@
-module Obj.Obj where
+module Obj.Obj (
+    ObjVertexIndex (..),
+    ObjFileLine (..),
+    ObjFile (..)
+) where
 
 -- Data types for the elements of an obj file
 -- see https://en.wikipedia.org/wiki/Wavefront_.obj_file#File_format
