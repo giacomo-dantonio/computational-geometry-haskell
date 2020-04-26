@@ -60,6 +60,7 @@ executable computational-geometry-haskell
   build-depends:       base >=4.9 && <4.10
                      , vector >=0.12 && <0.13
                      , containers >=0.6 && <0.7
+                     , unordered-containers >= 0.2 && < 0.3
   
   -- Directories containing source files.
   hs-source-dirs:      src

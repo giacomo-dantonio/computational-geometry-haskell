@@ -29,3 +29,5 @@ module Mesh.IndexedFaceSet (
             ++ ", #faces "
             ++ show (nFaces mesh)
             ++ ")"
+
+    -- FIXME: implement isManifold

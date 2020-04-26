@@ -6,6 +6,7 @@ import Text.ParserCombinators.ReadP (readP_to_S)
 import Obj.Parse
 import Mesh.Import
 import Mesh.IndexedFaceSet
+import Mesh.HalfEdge
 
 main :: IO ()
 main = do
