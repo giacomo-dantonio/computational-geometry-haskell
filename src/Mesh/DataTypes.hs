@@ -1,9 +1,9 @@
 module Mesh.DataTypes (
     Point3D (..)
-,   MeshFace
+,   IndexedFace
 )where
 
     import Data.Array.IArray
 
     data Point3D a = Point a a a
-    type MeshFace = Array Int Int
+    type IndexedFace = Array Int Int
