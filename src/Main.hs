@@ -1,6 +1,5 @@
 module Main where
 
-import Data.Array (bounds)
 import Data.Maybe (fromMaybe, listToMaybe)
 import Text.ParserCombinators.ReadP (readP_to_S)
 

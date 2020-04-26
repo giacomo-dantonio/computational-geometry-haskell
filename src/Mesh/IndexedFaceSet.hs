@@ -1,22 +1,26 @@
 module Mesh.IndexedFaceSet (
     IndexedFaceSet (..)
+,   IndexedFace
 ) where
 
     import Mesh.DataTypes
-    import Data.Array.IArray
+    import Data.Vector (Vector, length)
+    import Prelude hiding (length)
     
+    type IndexedFace = Vector Int
+
     data IndexedFaceSet a = IndexedFaceSet
         {
-            vertices :: Array Int (Point3D a)
-        ,   faces    :: Array Int IndexedFace
+            vertices :: Vector (Point3D a)
+        ,   faces    :: Vector IndexedFace
         }
 
 
     nVertices :: IndexedFaceSet a -> Int
-    nVertices mesh = snd $ bounds $ vertices mesh
+    nVertices mesh = Data.Vector.length $ vertices mesh
 
     nFaces :: IndexedFaceSet a -> Int
-    nFaces mesh = snd $ bounds $ faces mesh
+    nFaces mesh = Data.Vector.length $ faces mesh
 
     instance Show (IndexedFaceSet a) where
         show mesh =

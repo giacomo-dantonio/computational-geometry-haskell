@@ -1,6 +1,7 @@
 module Mesh.Import ( fromObj ) where
 
-    import Data.Array
+    import Data.Vector (fromList)
+
     import Mesh.DataTypes
     import Mesh.IndexedFaceSet
     import Obj.Obj
@@ -15,7 +16,7 @@ module Mesh.Import ( fromObj ) where
     lineVertices _ = []
 
     lineFaces :: ObjFileLine -> [IndexedFace]
-    lineFaces (Face vertexIndices) = [listArray (0, length vertexIndices - 1) [index vertex | vertex <- vertexIndices]]
+    lineFaces (Face vertexIndices) = [fromList [index vertex | vertex <- vertexIndices]]
         where
             index :: ObjVertexIndex -> Int
             index (VertexIndex i) = i
@@ -31,8 +32,8 @@ module Mesh.Import ( fromObj ) where
     fromObj :: ObjFile -> IndexedFaceSet Double
     fromObj (Lines lines) =
         IndexedFaceSet {
-            vertices = listArray (0, length vertexList) vertexList,
-            faces = listArray (0, length faceList) faceList
+            vertices = fromList vertexList,
+            faces = fromList faceList
         }
         where
             vertexList = concatMap lineVertices lines
